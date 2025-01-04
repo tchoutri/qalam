@@ -1,0 +1,4 @@
+packages: ./
+with-compiler: ghc-9.10
+tests: True
+documentation: True

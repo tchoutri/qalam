@@ -1,0 +1,114 @@
+cabal-version: 3.0
+name: qalam
+version: 1.0.0.0
+category: Database
+synopsis: Storage engine based on RocksDB
+homepage: https://github.com/tchoutri/qalam/issues
+bug-reports: https://github.com/tchoutri/qalam/issues
+author: Théophile Choutri de Tarlé
+maintainer: Théophile Choutri de Tarlé
+license: MIT
+build-type: Simple
+extra-source-files:
+  LICENSE
+  README.md
+
+extra-doc-files:
+  CHANGELOG.md
+
+tested-with: ghc ==9.10.1
+
+source-repository head
+  type: git
+  location: https://github.com/tchoutri/qalam
+
+common common-extensions
+  default-extensions:
+    DeriveAnyClass
+    DerivingVia
+    DuplicateRecordFields
+    NoStarIsType
+    OverloadedLabels
+    OverloadedRecordDot
+    OverloadedStrings
+    PackageImports
+    PolyKinds
+    RecordWildCards
+    RequiredTypeArguments
+    StrictData
+    TypeFamilies
+    UndecidableInstances
+    ViewPatterns
+
+  default-language: GHC2024
+
+common common-ghc-options
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wpartial-fields
+    -Wredundant-constraints
+    -fhide-source-paths
+    -Wno-unused-do-bind
+    -funbox-strict-fields
+    -Wunused-packages
+    -funbox-small-strict-fields
+
+common common-rts-options
+  ghc-options:
+    -rtsopts
+    -threaded
+    -with-rtsopts=-N
+
+library
+  import: common-extensions
+  import: common-ghc-options
+  hs-source-dirs: src
+  -- cabal-gild: discover src
+  exposed-modules:
+    Qalam.Effect
+    Qalam.Model.Document.Types
+    Qalam.Model.Document.Update
+
+  build-depends:
+    base >=4.20 && <5.0,
+    bytestring >=0.12 && <0.13,
+    cborg ^>=0.2,
+    containers ^>=0.7,
+    effectful ^>=2.5,
+    effectful-core ^>=2.5,
+    filepath ^>=1.5,
+    heptapod ^>=1.1,
+    rocksdb-haskell-jprupp ^>=2.1,
+    serialise ^>=0.2,
+    text ^>=2.1,
+    uuid-types ^>=1.0,
+
+test-suite qalam-test
+  import: common-extensions
+  import: common-ghc-options
+  import: common-rts-options
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  hs-source-dirs: test
+  -- cabal-gild: discover test --exclude=**/*Main.hs
+  other-modules:
+    Test.Document
+    Test.Orphans
+    Test.TestingUtils
+
+  build-depends:
+    QuickCheck,
+    base,
+    containers,
+    effectful,
+    heptapod,
+    qalam,
+    tasty,
+    tasty-hunit,
+    tasty-quickcheck,
+    text,
+    uuid-types,
