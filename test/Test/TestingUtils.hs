@@ -23,12 +23,12 @@ randomDocumentTemplate :: MonadIO m => DocumentTemplate m
 randomDocumentTemplate =
   DocumentTemplate
     { version = pure 0
-    , documentId = liftIO $ UUID.generate
+    , documentId = liftIO UUID.generate
     , documentData = liftIO $ generate arbitrary
     }
 
 instantiateRandomDocument
-  :: (Qalam :> es)
+  :: Qalam :> es
   => DocumentTemplate (Eff es)
   -> Eff es Document
 instantiateRandomDocument
@@ -43,4 +43,3 @@ instantiateRandomDocument
     let document = Document{..}
     Update.insertDocument document
     pure document
-
