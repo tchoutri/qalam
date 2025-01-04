@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Test.Orphans where
 
 import Test.QuickCheck
