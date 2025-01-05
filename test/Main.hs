@@ -1,9 +1,40 @@
 module Main where
 
+import Database.RocksDB
+import Effectful
+import Effectful.FileSystem (FileSystem)
+import Effectful.FileSystem qualified as FileSystem
+import System.IO
 import Test.Tasty
+import Test.Tasty.Runners.Reporter qualified as Reporter
+
+import Test.Document qualified as DocumentTest
+import Test.TestingUtils
 
 main :: IO ()
-main = defaultMain . testGroup "Qalam Tests" $ specs
+main = do
+  hSetBuffering stdout LineBuffering
+  runEff . FileSystem.runFileSystem $
+    cleanUp
+  let config =
+        Config
+          { createIfMissing = True
+          , errorIfExists = False
+          , paranoidChecks = False
+          , maxFiles = Nothing
+          , prefixLength = Nothing
+          , bloomFilter = True
+          }
+  let testEnv = TestEnv
+  spec <- traverse (\comp -> runTestEff comp testEnv) specs
+  defaultMainWithIngredients [Reporter.ingredient] $
+    testGroup "Qalam Tests" spec
 
-specs :: [TestTree]
-specs = []
+specs :: [TestEff TestTree]
+specs =
+  [ DocumentTest.spec
+  ]
+
+cleanUp :: FileSystem :> es => Eff es ()
+cleanUp = do
+  FileSystem.removeDirectoryRecursive "test/test.db"

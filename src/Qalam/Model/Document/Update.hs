@@ -3,8 +3,11 @@ module Qalam.Model.Document.Update
   , deleteDocument
   ) where
 
+import Data.Text (Text)
+import Data.Text.Display
 import Data.UUID.Types (UUID)
 import Effectful
+
 import Qalam.Effect
 import Qalam.Effect qualified as Qalam
 import Qalam.Model.Document.Types

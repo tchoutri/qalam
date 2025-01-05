@@ -1,56 +1,69 @@
-module Qalam.Effect where
+{-# LANGUAGE IncoherentInstances #-}
+
+module Qalam.Effect
+  ( Qalam (..)
+  , runQalam
+  , put
+  , get
+  , delete
+  ) where
 
 import Codec.Serialise
 import Data.ByteString.Lazy qualified as BSL
 import Database.RocksDB qualified as RocksDB
 import Effectful
 import Effectful.Dispatch.Dynamic
-import System.OsPath (OsPath)
-import System.OsPath qualified as OsPath
 
 data Qalam :: Effect where
-  Put :: (Serialise key, Serialise value) => key -> value -> Qalam m ()
-  Get :: (Serialise key, Serialise value) => key -> Qalam m (Maybe value)
-  Delete :: Serialise key => key -> Qalam m ()
+  Put :: (Serialise key, Serialise value) => RocksDB.ColumnFamily -> key -> value -> Qalam m ()
+  Get :: (Serialise key, Serialise value) => RocksDB.ColumnFamily -> key -> Qalam m (Maybe value)
+  Delete :: Serialise key => RocksDB.ColumnFamily -> key -> Qalam m ()
 
 type instance DispatchOf Qalam = Dynamic
 
 runQalam
   :: IOE :> es
-  => OsPath
-  -- ^ Database
-  -> RocksDB.Config
-  -- ^ Configuration
+  => RocksDB.DB
   -> Eff (Qalam : es) a
   -> Eff es a
-runQalam path config = interpret_ $ \action -> do
-  filepath <- liftIO $ OsPath.decodeFS path
-  RocksDB.withDBCF filepath config [("datastore", config), ("indexes", config)] $
-    \db -> case action of
-      Put key value ->
-        RocksDB.putCF
-          db
-          (head db.columnFamilies)
-          (BSL.toStrict $ serialise key)
-          (BSL.toStrict $ serialise value)
-      Get key -> do
-        mValue <-
-          RocksDB.getCF
-            db
-            (head db.columnFamilies)
-            (BSL.toStrict $ serialise key)
-        pure $ deserialise . BSL.fromStrict <$> mValue
-      Delete key -> do
-        RocksDB.deleteCF
-          db
-          (head db.columnFamilies)
-          (BSL.toStrict $ serialise key)
+runQalam db = interpret_ $ \action -> case action of
+  Put cf key value ->
+    RocksDB.putCF
+      db
+      cf
+      (BSL.toStrict $ serialise key)
+      (BSL.toStrict $ serialise value)
+  Get cf key -> do
+    mValue <-
+      RocksDB.getCF
+        db
+        cf
+        (BSL.toStrict $ serialise key)
+    pure $ deserialise . BSL.fromStrict <$> mValue
+  Delete cf key -> do
+    RocksDB.deleteCF
+      db
+      cf
+      (BSL.toStrict $ serialise key)
 
-put :: (Qalam :> es, Serialise key, Serialise value) => key -> value -> Eff es ()
-put key value = send $ Put key value
+put
+  :: (Qalam :> es, Serialise key, Serialise value)
+  => RocksDB.ColumnFamily
+  -> key
+  -> value
+  -> Eff es ()
+put cf key value = send $ Put cf key value
 
-get :: (Qalam :> es, Serialise key, Serialise value) => key -> Eff es (Maybe value)
-get key = send $ Get key
+get
+  :: (Qalam :> es, Serialise key, Serialise value)
+  => RocksDB.ColumnFamily
+  -> key
+  -> Eff es (Maybe value)
+get cf key = send $ Get cf key
 
-delete :: (Qalam :> es, Serialise key) => key -> Eff es ()
-delete key = send $ Delete key
+delete
+  :: (Qalam :> es, Serialise key)
+  => RocksDB.ColumnFamily
+  -> key
+  -> Eff es ()
+delete cf key = send $ Delete cf key

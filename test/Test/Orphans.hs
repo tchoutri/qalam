@@ -1,9 +1,10 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
+
 module Test.Orphans where
 
-import Test.QuickCheck
-import Data.Text qualified as Text
 import Data.Text (Text)
+import Data.Text qualified as Text
+import Test.QuickCheck
 
 import Qalam.Model.Document.Types
 
