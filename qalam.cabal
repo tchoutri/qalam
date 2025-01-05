@@ -70,6 +70,7 @@ library
   -- cabal-gild: discover src
   exposed-modules:
     Qalam.Effect
+    Qalam.Model.Document.Query
     Qalam.Model.Document.Types
     Qalam.Model.Document.Update
 
@@ -107,8 +108,10 @@ test-suite qalam-test
     effectful,
     heptapod,
     qalam,
+    rocksdb-haskell-jprupp,
     tasty,
     tasty-hunit,
     tasty-quickcheck,
+    tasty-test-reporter,
     text,
     uuid-types,

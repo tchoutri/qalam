@@ -5,8 +5,6 @@ import Data.ByteString.Lazy qualified as BSL
 import Database.RocksDB qualified as RocksDB
 import Effectful
 import Effectful.Dispatch.Dynamic
-import System.OsPath (OsPath)
-import System.OsPath qualified as OsPath
 
 data Qalam :: Effect where
   Put :: (Serialise key, Serialise value) => key -> value -> Qalam m ()
@@ -17,14 +15,13 @@ type instance DispatchOf Qalam = Dynamic
 
 runQalam
   :: IOE :> es
-  => OsPath
+  => FilePath
   -- ^ Database
   -> RocksDB.Config
   -- ^ Configuration
   -> Eff (Qalam : es) a
   -> Eff es a
-runQalam path config = interpret_ $ \action -> do
-  filepath <- liftIO $ OsPath.decodeFS path
+runQalam filepath config = interpret_ $ \action -> do
   RocksDB.withDBCF filepath config [("datastore", config), ("indexes", config)] $
     \db -> case action of
       Put key value ->

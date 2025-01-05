@@ -1,3 +1,14 @@
 packages: ./
 with-compiler: ghc-9.10
 tests: True
+
+source-repository-package
+  type: git
+  location: https://github.com/goodlyrottenapple/tasty-test-reporter
+  tag: b704130
+
+allow-newer:
+  tasty-test-reporter:ansi-terminal
+  , tasty-test-reporter:tasty
+  , tasty-test-reporter:filepath
+  , tasty-test-reporter:containers
