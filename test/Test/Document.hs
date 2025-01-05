@@ -11,6 +11,10 @@ spec =
   testThese
     "Document Operations"
     [ testThis "Insertion and Retrieval" testDocumentInsertionAndRetrieval
+    , testThese
+        "Key scan"
+        [ testThis "" undefined
+        ]
     ]
 
 testDocumentInsertionAndRetrieval :: TestEff ()

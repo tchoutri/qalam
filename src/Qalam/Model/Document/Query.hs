@@ -10,4 +10,4 @@ import Qalam.Effect qualified as Qalam
 import Qalam.Model.Document.Types (Document)
 
 getDocumentById :: Qalam :> es => UUID -> Eff es (Maybe Document)
-getDocumentById documentId = Qalam.get documentId
+getDocumentById documetId = Qalam.get documentId

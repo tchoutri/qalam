@@ -1,6 +1,6 @@
 module Test.TestingUtils
   ( TestEff
-  , TestEnv(..)
+  , TestEnv (..)
   , runTestEff
   , testThis
   , testThese
@@ -17,20 +17,20 @@ module Test.TestingUtils
   , instantiateRandomDocument
   ) where
 
+import Data.Function ((&))
 import Data.Map.Strict (Map)
 import Data.UUID.Types (UUID)
 import Database.RocksDB qualified as RocksDB
 import Effectful
-import GHC.Stack
-import Test.Tasty qualified as Test
+import Effectful.Reader.Static (Reader)
+import Effectful.Reader.Static qualified as Reader
 import GHC.Generics
+import GHC.Stack
 import Heptapod qualified as UUID
 import Test.QuickCheck
-import Effectful.Reader.Static qualified as Reader
-import Effectful.Reader.Static (Reader)
-import Test.Tasty.HUnit qualified as Test
 import Test.Tasty (TestTree)
-import Data.Function ((&))
+import Test.Tasty qualified as Test
+import Test.Tasty.HUnit qualified as Test
 
 import Qalam.Effect
 import Qalam.Model.Document.Types
@@ -38,8 +38,7 @@ import Qalam.Model.Document.Update qualified as Update
 import Test.Orphans ()
 
 data TestEnv = TestEnv
-  { databasePath :: FilePath
-  , databaseConfig :: RocksDB.Config
+  { database :: RocksDB.DB
   }
 
 type TestEff =

@@ -1,15 +1,15 @@
 module Main where
 
 import Database.RocksDB
+import Effectful
+import Effectful.FileSystem (FileSystem)
+import Effectful.FileSystem qualified as FileSystem
 import System.IO
 import Test.Tasty
 import Test.Tasty.Runners.Reporter qualified as Reporter
-import Effectful.FileSystem qualified as FileSystem
-import Effectful.FileSystem (FileSystem)
-import Effectful
 
-import Test.TestingUtils
 import Test.Document qualified as DocumentTest
+import Test.TestingUtils
 
 main :: IO ()
 main = do
@@ -25,14 +25,14 @@ main = do
           , prefixLength = Nothing
           , bloomFilter = True
           }
-  let testEnv = TestEnv "test/test.db" config
+  let testEnv = TestEnv
   spec <- traverse (\comp -> runTestEff comp testEnv) specs
   defaultMainWithIngredients [Reporter.ingredient] $
     testGroup "Qalam Tests" spec
 
 specs :: [TestEff TestTree]
-specs = [
-  DocumentTest.spec
+specs =
+  [ DocumentTest.spec
   ]
 
 cleanUp :: FileSystem :> es => Eff es ()

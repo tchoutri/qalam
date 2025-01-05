@@ -57,6 +57,8 @@ common common-ghc-options
     -Wunused-packages
     -funbox-small-strict-fields
 
+  ghc-options: -fplugin=Effectful.Plugin
+
 common common-rts-options
   ghc-options:
     -rtsopts
@@ -73,6 +75,9 @@ library
     Qalam.Model.Document.Query
     Qalam.Model.Document.Types
     Qalam.Model.Document.Update
+    Qalam.Model.Index.Query
+    Qalam.Model.Index.Types
+    Qalam.Model.Index.Update
 
   build-depends:
     base >=4.20 && <5.0,
@@ -81,11 +86,14 @@ library
     containers ^>=0.7,
     effectful ^>=2.5,
     effectful-core ^>=2.5,
+    effectful-plugin ^>=1.1,
     filepath ^>=1.5,
     heptapod ^>=1.1,
     rocksdb-haskell-jprupp ^>=2.1,
     serialise ^>=0.2,
     text ^>=2.1,
+    text-builder-linear ^>=0.1,
+    text-display ^>=1.0,
     uuid-types ^>=1.0,
 
 test-suite qalam-test
@@ -106,6 +114,7 @@ test-suite qalam-test
     base,
     containers,
     effectful,
+    effectful-plugin,
     heptapod,
     qalam,
     rocksdb-haskell-jprupp,
